@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Set your OpenAI API Key
+# Load your OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/")
@@ -18,18 +18,19 @@ def ask():
         return jsonify({"error": "No question provided"}), 400
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        # Calling GPT-3.5 (works with free API access)
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are NeuroForge AI Assistant."},
+                {"role": "system", "content": "You are NeuroForge AI Z+ — an ultra-intelligent assistant."},
                 {"role": "user", "content": user_input}
             ]
         )
-        answer = response['choices'][0]['message']['content']
+        answer = response.choices[0].message.content
         return jsonify({"answer": answer.strip()})
     except Exception as e:
+        print("❌ ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
+    app.run(debug=True, port=5001)
